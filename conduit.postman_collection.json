@@ -1,0 +1,277 @@
+{
+  "info": {
+    "_postman_id": "05db185f-176a-45b6-ad68-bce3551d4fed",
+    "name": "conduit",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "32474707"
+  },
+  "item": [
+    {
+      "name": "accounts",
+      "item": [
+        {
+          "name": "accounts",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"direction\": \"credit\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{conduit_api}}/accounts",
+              "host": [
+                "{{conduit_api}}"
+              ],
+              "path": [
+                "accounts"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "accounts",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"direction\": \"credit\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{conduit_api}}/accounts",
+                  "host": [
+                    "{{conduit_api}}"
+                  ],
+                  "path": [
+                    "accounts"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "78"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"4e-+gUXalG4z+P7fCc7SaOs/XLHtW4\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Tue, 05 May 2026 16:58:01 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"id\": \"ad91d835-0973-404b-8996-87cbb5c28d84\",\n    \"direction\": \"credit\",\n    \"balance\": 0\n}"
+            }
+          ]
+        },
+        {
+          "name": "account",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{conduit_api}}/accounts/:id",
+              "host": [
+                "{{conduit_api}}"
+              ],
+              "path": [
+                "accounts",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "ad91d835-0973-404b-8996-87cbb5c28d84"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "account",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{conduit_api}}/accounts/:id",
+                  "host": [
+                    "{{conduit_api}}"
+                  ],
+                  "path": [
+                    "accounts",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "ad91d835-0973-404b-8996-87cbb5c28d84"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "80"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"50-fS1hdFHfO6T6D9HBH1S0+2v3SyI\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Tue, 05 May 2026 16:58:38 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"id\": \"ad91d835-0973-404b-8996-87cbb5c28d84\",\n    \"direction\": \"credit\",\n    \"balance\": 100\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "transactions",
+      "item": [
+        {
+          "name": "transactions",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"test\",\n    \"entries\": [\n        {\n            \"direction\": \"debit\",\n            \"account_id\": \"32677c4f-6993-4f00-b050-c2fcf4c130fc\",\n            \"amount\": 100\n        },\n        {\n            \"direction\": \"credit\",\n            \"account_id\": \"ad91d835-0973-404b-8996-87cbb5c28d84\",\n            \"amount\": 100\n        }\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{conduit_api}}/transactions",
+              "host": [
+                "{{conduit_api}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "transactions",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"test\",\n    \"entries\": [\n        {\n            \"direction\": \"debit\",\n            \"account_id\": \"32677c4f-6993-4f00-b050-c2fcf4c130fc\",\n            \"amount\": 100\n        },\n        {\n            \"direction\": \"credit\",\n            \"account_id\": \"ad91d835-0973-404b-8996-87cbb5c28d84\",\n            \"amount\": 100\n        }\n    ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{conduit_api}}/transactions",
+                  "host": [
+                    "{{conduit_api}}"
+                  ],
+                  "path": [
+                    "transactions"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "334"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"14e-N+Gg31DwPQeQl6PImxsuQ2rqqNM\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Tue, 05 May 2026 16:58:11 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"id\": \"f7e6ed2b-916b-4486-9490-fdc0fdba441b\",\n    \"name\": \"test\",\n    \"entries\": [\n        {\n            \"id\": \"386fd73b-8740-4ad8-9233-31c66101a88a\",\n            \"account_id\": \"32677c4f-6993-4f00-b050-c2fcf4c130fc\",\n            \"direction\": \"debit\",\n            \"amount\": 100\n        },\n        {\n            \"id\": \"ec8325ee-bb5d-42dc-8152-b40c648c909d\",\n            \"account_id\": \"ad91d835-0973-404b-8996-87cbb5c28d84\",\n            \"direction\": \"credit\",\n            \"amount\": 100\n        }\n    ]\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
