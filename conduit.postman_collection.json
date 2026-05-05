@@ -10,13 +10,19 @@
       "name": "accounts",
       "item": [
         {
-          "name": "accounts",
+          "name": "debit account",
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Idempotency-Key",
+                "value": "01J9X3K2VQE7G4Z9TC4VB2A1MA",
+                "type": "text"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"direction\": \"credit\"\n}",
+              "raw": "{\n    \"name\": \"debit test\",\n    \"direction\": \"debit\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -35,13 +41,19 @@
           },
           "response": [
             {
-              "name": "accounts",
+              "name": "debit account",
               "originalRequest": {
                 "method": "POST",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Idempotency-Key",
+                    "value": "01J9X3K2VQE7G4Z9TC4VB2A1MA",
+                    "type": "text"
+                  }
+                ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n    \"direction\": \"credit\"\n}",
+                  "raw": "{\n    \"name\": \"debit test\",\n    \"direction\": \"debit\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -72,15 +84,15 @@
                 },
                 {
                   "key": "Content-Length",
-                  "value": "78"
+                  "value": "177"
                 },
                 {
                   "key": "ETag",
-                  "value": "W/\"4e-+gUXalG4z+P7fCc7SaOs/XLHtW4\""
+                  "value": "W/\"b1-ZaS7aRivMkYGCe+sUzwikuyNe+U\""
                 },
                 {
                   "key": "Date",
-                  "value": "Tue, 05 May 2026 16:58:01 GMT"
+                  "value": "Tue, 05 May 2026 23:00:20 GMT"
                 },
                 {
                   "key": "Connection",
@@ -92,12 +104,111 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"id\": \"ad91d835-0973-404b-8996-87cbb5c28d84\",\n    \"direction\": \"credit\",\n    \"balance\": 0\n}"
+              "body": "{\n    \"id\": \"114ce75f-8be5-4b21-8e25-50ae6cde56b0\",\n    \"direction\": \"debit\",\n    \"balance\": 0,\n    \"created_at\": \"2026-05-05T23:00:20.170Z\",\n    \"updated_at\": \"2026-05-05T23:00:20.170Z\",\n    \"name\": \"debit test\"\n}"
             }
           ]
         },
         {
-          "name": "account",
+          "name": "credit account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Idempotency-Key",
+                "value": "01J9X3K2VQE7G4Z9TC4VB2A1MF",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"credit test\",\n    \"direction\": \"credit\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{conduit_api}}/accounts",
+              "host": [
+                "{{conduit_api}}"
+              ],
+              "path": [
+                "accounts"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "credit account",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Idempotency-Key",
+                    "value": "01J9X3K2VQE7G4Z9TC4VB2A1MF",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"credit test\",\n    \"direction\": \"credit\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{conduit_api}}/accounts",
+                  "host": [
+                    "{{conduit_api}}"
+                  ],
+                  "path": [
+                    "accounts"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "179"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"b3-Nxph2A4A3VRlrJrUfTE8VZJp+dI\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Tue, 05 May 2026 23:01:10 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"id\": \"66251af6-7f45-4626-a0b3-22ae6ca75c53\",\n    \"direction\": \"credit\",\n    \"balance\": 0,\n    \"created_at\": \"2026-05-05T23:01:10.501Z\",\n    \"updated_at\": \"2026-05-05T23:01:10.501Z\",\n    \"name\": \"credit test\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "account/:id",
           "request": {
             "method": "GET",
             "header": [],
@@ -113,14 +224,14 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "ad91d835-0973-404b-8996-87cbb5c28d84"
+                  "value": "66251af6-7f45-4626-a0b3-22ae6ca75c53"
                 }
               ]
             }
           },
           "response": [
             {
-              "name": "account",
+              "name": "account/:id",
               "originalRequest": {
                 "method": "GET",
                 "header": [],
@@ -136,7 +247,7 @@
                   "variable": [
                     {
                       "key": "id",
-                      "value": "ad91d835-0973-404b-8996-87cbb5c28d84"
+                      "value": "66251af6-7f45-4626-a0b3-22ae6ca75c53"
                     }
                   ]
                 }
@@ -155,15 +266,15 @@
                 },
                 {
                   "key": "Content-Length",
-                  "value": "80"
+                  "value": "179"
                 },
                 {
                   "key": "ETag",
-                  "value": "W/\"50-fS1hdFHfO6T6D9HBH1S0+2v3SyI\""
+                  "value": "W/\"b3-Nxph2A4A3VRlrJrUfTE8VZJp+dI\""
                 },
                 {
                   "key": "Date",
-                  "value": "Tue, 05 May 2026 16:58:38 GMT"
+                  "value": "Tue, 05 May 2026 23:02:33 GMT"
                 },
                 {
                   "key": "Connection",
@@ -175,7 +286,160 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"id\": \"ad91d835-0973-404b-8996-87cbb5c28d84\",\n    \"direction\": \"credit\",\n    \"balance\": 100\n}"
+              "body": "{\n    \"id\": \"66251af6-7f45-4626-a0b3-22ae6ca75c53\",\n    \"direction\": \"credit\",\n    \"balance\": 0,\n    \"created_at\": \"2026-05-05T23:01:10.501Z\",\n    \"updated_at\": \"2026-05-05T23:01:10.501Z\",\n    \"name\": \"credit test\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "account/:id/entries",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{conduit_api}}/accounts/:id/entries",
+              "host": [
+                "{{conduit_api}}"
+              ],
+              "path": [
+                "accounts",
+                ":id",
+                "entries"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "66251af6-7f45-4626-a0b3-22ae6ca75c53"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "account/:id",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{conduit_api}}/accounts/:id",
+                  "host": [
+                    "{{conduit_api}}"
+                  ],
+                  "path": [
+                    "accounts",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "66251af6-7f45-4626-a0b3-22ae6ca75c53"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "179"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"b3-Nxph2A4A3VRlrJrUfTE8VZJp+dI\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Tue, 05 May 2026 23:02:33 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"id\": \"66251af6-7f45-4626-a0b3-22ae6ca75c53\",\n    \"direction\": \"credit\",\n    \"balance\": 0,\n    \"created_at\": \"2026-05-05T23:01:10.501Z\",\n    \"updated_at\": \"2026-05-05T23:01:10.501Z\",\n    \"name\": \"credit test\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "accounts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{conduit_api}}/accounts",
+              "host": [
+                "{{conduit_api}}"
+              ],
+              "path": [
+                "accounts"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "accounts",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{conduit_api}}/accounts",
+                  "host": [
+                    "{{conduit_api}}"
+                  ],
+                  "path": [
+                    "accounts"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "401"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"191-EiAIAaJmFyEOI4Z72SkC0ZeoE4I\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Tue, 05 May 2026 23:01:56 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"items\": [\n        {\n            \"id\": \"66251af6-7f45-4626-a0b3-22ae6ca75c53\",\n            \"direction\": \"credit\",\n            \"balance\": 0,\n            \"created_at\": \"2026-05-05T23:01:10.501Z\",\n            \"updated_at\": \"2026-05-05T23:01:10.501Z\",\n            \"name\": \"credit test\"\n        },\n        {\n            \"id\": \"114ce75f-8be5-4b21-8e25-50ae6cde56b0\",\n            \"direction\": \"debit\",\n            \"balance\": 0,\n            \"created_at\": \"2026-05-05T23:00:20.170Z\",\n            \"updated_at\": \"2026-05-05T23:00:20.170Z\",\n            \"name\": \"debit test\"\n        }\n    ],\n    \"total\": 2,\n    \"offset\": 0,\n    \"limit\": 20\n}"
             }
           ]
         }
@@ -188,10 +452,22 @@
           "name": "transactions",
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Idempotency-Key",
+                "value": "02J9X3K2VQE7G4Z9TC4VB2A1MN",
+                "type": "text"
+              },
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"test\",\n    \"entries\": [\n        {\n            \"direction\": \"debit\",\n            \"account_id\": \"32677c4f-6993-4f00-b050-c2fcf4c130fc\",\n            \"amount\": 100\n        },\n        {\n            \"direction\": \"credit\",\n            \"account_id\": \"ad91d835-0973-404b-8996-87cbb5c28d84\",\n            \"amount\": 100\n        }\n    ]\n}",
+              "raw": "{\n    \"name\": \"test tx\",\n    \"entries\": [\n        {\n            \"direction\": \"debit\",\n            \"account_id\": \"114ce75f-8be5-4b21-8e25-50ae6cde56b0\",\n            \"amount\": 100\n        },\n        {\n            \"direction\": \"credit\",\n            \"account_id\": \"66251af6-7f45-4626-a0b3-22ae6ca75c53\",\n            \"amount\": 100\n        }\n    ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -213,10 +489,22 @@
               "name": "transactions",
               "originalRequest": {
                 "method": "POST",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Idempotency-Key",
+                    "value": "02J9X3K2VQE7G4Z9TC4VB2A1MN",
+                    "type": "text"
+                  },
+                  {
+                    "key": "",
+                    "value": "",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n    \"name\": \"test\",\n    \"entries\": [\n        {\n            \"direction\": \"debit\",\n            \"account_id\": \"32677c4f-6993-4f00-b050-c2fcf4c130fc\",\n            \"amount\": 100\n        },\n        {\n            \"direction\": \"credit\",\n            \"account_id\": \"ad91d835-0973-404b-8996-87cbb5c28d84\",\n            \"amount\": 100\n        }\n    ]\n}",
+                  "raw": "{\n    \"name\": \"test tx\",\n    \"entries\": [\n        {\n            \"direction\": \"debit\",\n            \"account_id\": \"114ce75f-8be5-4b21-8e25-50ae6cde56b0\",\n            \"amount\": 100\n        },\n        {\n            \"direction\": \"credit\",\n            \"account_id\": \"66251af6-7f45-4626-a0b3-22ae6ca75c53\",\n            \"amount\": 100\n        }\n    ]\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -247,15 +535,15 @@
                 },
                 {
                   "key": "Content-Length",
-                  "value": "334"
+                  "value": "569"
                 },
                 {
                   "key": "ETag",
-                  "value": "W/\"14e-N+Gg31DwPQeQl6PImxsuQ2rqqNM\""
+                  "value": "W/\"239-efvCwILJJitPxRN6nV3LmR9cdGI\""
                 },
                 {
                   "key": "Date",
-                  "value": "Tue, 05 May 2026 16:58:11 GMT"
+                  "value": "Tue, 05 May 2026 23:04:46 GMT"
                 },
                 {
                   "key": "Connection",
@@ -267,7 +555,176 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"id\": \"f7e6ed2b-916b-4486-9490-fdc0fdba441b\",\n    \"name\": \"test\",\n    \"entries\": [\n        {\n            \"id\": \"386fd73b-8740-4ad8-9233-31c66101a88a\",\n            \"account_id\": \"32677c4f-6993-4f00-b050-c2fcf4c130fc\",\n            \"direction\": \"debit\",\n            \"amount\": 100\n        },\n        {\n            \"id\": \"ec8325ee-bb5d-42dc-8152-b40c648c909d\",\n            \"account_id\": \"ad91d835-0973-404b-8996-87cbb5c28d84\",\n            \"direction\": \"credit\",\n            \"amount\": 100\n        }\n    ]\n}"
+              "body": "{\n    \"id\": \"1515a368-c5ce-49a5-9409-543c63f0c929\",\n    \"entries\": [\n        {\n            \"id\": \"ea11c22a-0ff4-419d-b40b-23a92e324bbe\",\n            \"transaction_id\": \"1515a368-c5ce-49a5-9409-543c63f0c929\",\n            \"account_id\": \"114ce75f-8be5-4b21-8e25-50ae6cde56b0\",\n            \"direction\": \"debit\",\n            \"amount\": 100,\n            \"created_at\": \"2026-05-05T23:04:46.704Z\"\n        },\n        {\n            \"id\": \"9688a5eb-12ff-4d9e-804b-f15eb6a03458\",\n            \"transaction_id\": \"1515a368-c5ce-49a5-9409-543c63f0c929\",\n            \"account_id\": \"66251af6-7f45-4626-a0b3-22ae6ca75c53\",\n            \"direction\": \"credit\",\n            \"amount\": 100,\n            \"created_at\": \"2026-05-05T23:04:46.704Z\"\n        }\n    ],\n    \"created_at\": \"2026-05-05T23:04:46.704Z\",\n    \"name\": \"test tx\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{conduit_api}}/transactions",
+              "host": [
+                "{{conduit_api}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "transactions",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "",
+                    "value": "",
+                    "type": "text",
+                    "disabled": true
+                  },
+                  {
+                    "key": "",
+                    "value": "",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "url": {
+                  "raw": "{{conduit_api}}/transactions",
+                  "host": [
+                    "{{conduit_api}}"
+                  ],
+                  "path": [
+                    "transactions"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "613"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"265-67KP+HBfxuS/iRx45q+XXXRkVrQ\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Tue, 05 May 2026 23:06:14 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"items\": [\n        {\n            \"id\": \"1515a368-c5ce-49a5-9409-543c63f0c929\",\n            \"entries\": [\n                {\n                    \"id\": \"ea11c22a-0ff4-419d-b40b-23a92e324bbe\",\n                    \"transaction_id\": \"1515a368-c5ce-49a5-9409-543c63f0c929\",\n                    \"account_id\": \"114ce75f-8be5-4b21-8e25-50ae6cde56b0\",\n                    \"direction\": \"debit\",\n                    \"amount\": 100,\n                    \"created_at\": \"2026-05-05T23:04:46.704Z\"\n                },\n                {\n                    \"id\": \"9688a5eb-12ff-4d9e-804b-f15eb6a03458\",\n                    \"transaction_id\": \"1515a368-c5ce-49a5-9409-543c63f0c929\",\n                    \"account_id\": \"66251af6-7f45-4626-a0b3-22ae6ca75c53\",\n                    \"direction\": \"credit\",\n                    \"amount\": 100,\n                    \"created_at\": \"2026-05-05T23:04:46.704Z\"\n                }\n            ],\n            \"created_at\": \"2026-05-05T23:04:46.704Z\",\n            \"name\": \"test tx\"\n        }\n    ],\n    \"total\": 1,\n    \"offset\": 0,\n    \"limit\": 20\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "reconciliation",
+      "item": [
+        {
+          "name": "reconciliation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{conduit_api}}/reconciliation",
+              "host": [
+                "{{conduit_api}}"
+              ],
+              "path": [
+                "reconciliation"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "reconciliation",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{conduit_api}}/reconciliation",
+                  "host": [
+                    "{{conduit_api}}"
+                  ],
+                  "path": [
+                    "reconciliation"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "212"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"d4-qUqKGHigBBHtS2G7Et/KbD57qLc\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Tue, 05 May 2026 23:06:48 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"status\": \"ok\",\n    \"accountsChecked\": 2,\n    \"transactionsReplayed\": 1,\n    \"globalSignedSum\": 0,\n    \"globalOpeningSignedSum\": 0,\n    \"globalInvariantHolds\": true,\n    \"discrepancies\": [],\n    \"orphanEntries\": [],\n    \"checkedAt\": \"2026-05-05T23:06:48.270Z\"\n}"
             }
           ]
         }

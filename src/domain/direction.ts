@@ -1,5 +1,15 @@
 export type Direction = 'debit' | 'credit';
 
+/**
+ * The sign a direction contributes to the global signed-balance sum.
+ * Debit accounts contribute positively, credit accounts negatively, so that
+ * `Σ (account.balanceCents × directionSign(account.direction))` is invariant
+ * under any sequence of balanced transactions.
+ */
+export function directionSign(direction: Direction): 1 | -1 {
+  return direction === 'debit' ? 1 : -1;
+}
+
 export interface EntryLike {
   direction: Direction;
   amountCents: number;

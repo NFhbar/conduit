@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AccountsModule } from '../accounts/accounts.module';
+import { AccountEntriesController } from './account-entries.controller';
 import { LedgerService } from './ledger.service';
 import { TransactionsController } from './transactions.controller';
 import { TRANSACTIONS_REPOSITORY } from './transactions.repository';
@@ -7,7 +8,7 @@ import { InMemoryTransactionsRepository } from './transactions.repository.in-mem
 
 @Module({
   imports: [AccountsModule],
-  controllers: [TransactionsController],
+  controllers: [TransactionsController, AccountEntriesController],
   providers: [
     LedgerService,
     {
@@ -15,6 +16,6 @@ import { InMemoryTransactionsRepository } from './transactions.repository.in-mem
       useClass: InMemoryTransactionsRepository,
     },
   ],
-  exports: [LedgerService],
+  exports: [LedgerService, TRANSACTIONS_REPOSITORY],
 })
 export class TransactionsModule {}

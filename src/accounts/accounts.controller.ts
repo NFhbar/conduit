@@ -1,4 +1,10 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  PageResponse,
+  PaginationQueryDto,
+  resolvePageQuery,
+  toPageResponse,
+} from '../common/pagination';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { AccountResponse, toAccountResponse } from './accounts.mapper';
 import { AccountsService } from './accounts.service';
@@ -16,6 +22,14 @@ export class AccountsController {
       balance: dto.balance,
     });
     return toAccountResponse(account);
+  }
+
+  @Get()
+  list(@Query() query: PaginationQueryDto): PageResponse<AccountResponse> {
+    return toPageResponse(
+      this.accounts.list(resolvePageQuery(query)),
+      toAccountResponse,
+    );
   }
 
   @Get(':id')

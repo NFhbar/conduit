@@ -10,6 +10,7 @@ import { AccountsService } from '../accounts/accounts.service';
 import {
   DuplicateIdError,
   EntityNotFoundError,
+  StaleVersionError,
 } from '../common/repository-errors';
 import { dollarsToCents } from '../domain/money';
 import {
@@ -243,6 +244,109 @@ describe('LedgerService', () => {
     expect(accounts.findById(liabId).balanceCents).toBe(expectedRemaining);
   });
 
+  describe('timestamp + back-reference invariants', () => {
+    it('stamps the same `now` on the transaction, every entry, and every touched account', () => {
+      const { a, b } = setupTwoAccounts();
+      const now = new Date('2026-05-05T10:00:00.000Z');
+      const expected = '2026-05-05T10:00:00.000Z';
+
+      const tx = ledger.applyTransaction(
+        {
+          entries: [
+            { accountId: a.id, direction: 'debit', amount: 5 },
+            { accountId: b.id, direction: 'credit', amount: 5 },
+          ],
+        },
+        now,
+      );
+
+      expect(tx.createdAt).toBe(expected);
+      for (const entry of tx.entries) {
+        expect(entry.createdAt).toBe(expected);
+        expect(entry.transactionId).toBe(tx.id);
+      }
+      expect(accounts.findById(a.id).updatedAt).toBe(expected);
+      expect(accounts.findById(b.id).updatedAt).toBe(expected);
+      // Symmetry: the same value should be observable via the transactions
+      // repository, not just the return value.
+      expect(transactionsRepo.findById(tx.id)?.createdAt).toBe(expected);
+    });
+
+    it('list returns the paginated transactions envelope', () => {
+      const { a, b } = setupTwoAccounts();
+      ledger.applyTransaction({
+        entries: [
+          { accountId: a.id, direction: 'debit', amount: 1 },
+          { accountId: b.id, direction: 'credit', amount: 1 },
+        ],
+      });
+      ledger.applyTransaction({
+        entries: [
+          { accountId: a.id, direction: 'debit', amount: 2 },
+          { accountId: b.id, direction: 'credit', amount: 2 },
+        ],
+      });
+      const page = ledger.list({ offset: 0, limit: 10 });
+      expect(page.total).toBe(2);
+      expect(page.items).toHaveLength(2);
+    });
+
+    it('findEntriesByAccountId returns only entries that touch the account', () => {
+      const { a, b } = setupTwoAccounts();
+      ledger.applyTransaction({
+        entries: [
+          { accountId: a.id, direction: 'debit', amount: 7 },
+          { accountId: b.id, direction: 'credit', amount: 7 },
+        ],
+      });
+      const page = ledger.findEntriesByAccountId(a.id, {
+        offset: 0,
+        limit: 10,
+      });
+      expect(page.total).toBe(1);
+      expect(page.items[0].accountId).toBe(a.id);
+    });
+
+    it('findEntriesByAccountId throws NotFoundException for an unknown account', () => {
+      expect(() =>
+        ledger.findEntriesByAccountId('no-such-account', {
+          offset: 0,
+          limit: 10,
+        }),
+      ).toThrow(NotFoundException);
+    });
+
+    it('does not change createdAt on accounts that have been mutated by transactions', () => {
+      // Account creation captures createdAt; subsequent transactions only
+      // advance updatedAt. The two diverge for any account that has
+      // participated in a transaction.
+      const created = new Date('2026-01-01T00:00:00.000Z');
+      const txTime = new Date('2026-06-01T00:00:00.000Z');
+      const a = accounts.create(
+        { id: randomBusinessKey('debit'), direction: 'debit' },
+        created,
+      );
+      const b = accounts.create(
+        { id: randomBusinessKey('credit'), direction: 'credit' },
+        created,
+      );
+
+      ledger.applyTransaction(
+        {
+          entries: [
+            { accountId: a.id, direction: 'debit', amount: 1 },
+            { accountId: b.id, direction: 'credit', amount: 1 },
+          ],
+        },
+        txTime,
+      );
+
+      const after = accounts.findById(a.id);
+      expect(after.createdAt).toBe('2026-01-01T00:00:00.000Z');
+      expect(after.updatedAt).toBe('2026-06-01T00:00:00.000Z');
+    });
+  });
+
   describe('defensive translation of repository errors', () => {
     // The pre-checks in `applyTransaction` make these typed throws unreachable
     // in normal single-threaded flow; the catches exist to guard a future
@@ -265,11 +369,19 @@ describe('LedgerService', () => {
       const stubAccount: Account = {
         id: 'stub',
         direction: 'debit',
+        openingBalanceCents: 0,
         balanceCents: 0,
+        version: 0,
+        createdAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-01-01T00:00:00.000Z',
       };
       const stubAccountsRepo: AccountsRepository = {
         create: jest.fn(),
         findById: jest.fn().mockReturnValue(stubAccount),
+        findAll: jest.fn().mockReturnValue([]),
+        findPage: jest
+          .fn()
+          .mockReturnValue({ items: [], total: 0, offset: 0, limit: 20 }),
         update: jest.fn(() => {
           throw new EntityNotFoundError('account', 'stub');
         }),
@@ -293,6 +405,13 @@ describe('LedgerService', () => {
       const { a, b } = setupTwoAccounts();
       const stubTransactionsRepo: TransactionsRepository = {
         findById: jest.fn().mockReturnValue(undefined),
+        findAll: jest.fn().mockReturnValue([]),
+        findPage: jest
+          .fn()
+          .mockReturnValue({ items: [], total: 0, offset: 0, limit: 20 }),
+        findEntriesByAccountId: jest
+          .fn()
+          .mockReturnValue({ items: [], total: 0, offset: 0, limit: 20 }),
         create: jest.fn(() => {
           throw new DuplicateIdError('transaction', 'stub');
         }),
@@ -312,16 +431,105 @@ describe('LedgerService', () => {
       ).toThrow(ConflictException);
     });
 
+    it('translates StaleVersionError from accountsRepo.update into ConflictException (lost-update race)', () => {
+      // Reproduce the canonical optimistic-concurrency race using the real
+      // in-memory repo. The "second writer" is simulated by bumping the
+      // stored account's version between LedgerService's read and commit:
+      // the racing repo's `findById` returns the original (version 0), but
+      // when commit reaches `update`, the stored version is 1 and the
+      // repo's version check fires.
+      const { a, b } = setupTwoAccounts();
+      const originalA = accountsRepo.findById(a.id)!;
+      const realFindById = accountsRepo.findById.bind(accountsRepo);
+      const racingAccountsRepo: AccountsRepository = {
+        create: accountsRepo.create.bind(accountsRepo),
+        findAll: accountsRepo.findAll.bind(accountsRepo),
+        findPage: accountsRepo.findPage.bind(accountsRepo),
+        update: accountsRepo.update.bind(accountsRepo),
+        findById: jest.fn((id: string) => {
+          if (id === a.id) {
+            // Concurrent commit happens between the service's pre-fetch and
+            // its `update` call: we hand the service a stale snapshot, then
+            // bump the stored row's version so the version check on commit
+            // disagrees.
+            const stored = realFindById(a.id)!;
+            accountsRepo.update({ ...stored, balanceCents: 9999 });
+            return originalA;
+          }
+          return realFindById(id);
+        }),
+      };
+      const racingLedger = new LedgerService(
+        racingAccountsRepo,
+        transactionsRepo,
+      );
+
+      expect(() =>
+        racingLedger.applyTransaction({
+          entries: [
+            { accountId: a.id, direction: 'debit', amount: 5 },
+            { accountId: b.id, direction: 'credit', amount: 5 },
+          ],
+        }),
+      ).toThrow(ConflictException);
+    });
+
+    it('a second-pass repo unit-test confirms the typed error is StaleVersionError', () => {
+      // The translation above is what HTTP callers see; this assertion makes
+      // sure the underlying error class is the one the interface advertises.
+      const stubAccount: Account = {
+        id: 'stub',
+        direction: 'debit',
+        openingBalanceCents: 0,
+        balanceCents: 0,
+        version: 0,
+        createdAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-01-01T00:00:00.000Z',
+      };
+      const stubAccountsRepo: AccountsRepository = {
+        create: jest.fn(),
+        findById: jest.fn().mockReturnValue(stubAccount),
+        findAll: jest.fn().mockReturnValue([]),
+        findPage: jest
+          .fn()
+          .mockReturnValue({ items: [], total: 0, offset: 0, limit: 20 }),
+        update: jest.fn(() => {
+          throw new StaleVersionError('account', 'stub', 0, 1);
+        }),
+      };
+      const racingLedger = new LedgerService(
+        stubAccountsRepo,
+        new InMemoryTransactionsRepository(),
+      );
+
+      expect(() =>
+        racingLedger.applyTransaction({
+          entries: [
+            { accountId: 'stub', direction: 'debit', amount: 1 },
+            { accountId: 'stub', direction: 'credit', amount: 1 },
+          ],
+        }),
+      ).toThrow(ConflictException);
+    });
+
     it('rethrows unrecognized errors from the commit phase unchanged', () => {
       const stubAccount: Account = {
         id: 'stub',
         direction: 'debit',
+        openingBalanceCents: 0,
         balanceCents: 0,
+        version: 0,
+        createdAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-01-01T00:00:00.000Z',
       };
       class CustomError extends Error {}
       const stubAccountsRepo: AccountsRepository = {
         create: jest.fn(),
         findById: jest.fn().mockReturnValue(stubAccount),
+        findAll: jest.fn().mockReturnValue([]),
+        findPage: jest
+          .fn()
+          .mockReturnValue({ items: [], total: 0, offset: 0, limit: 20 }),
         update: jest.fn(() => {
           throw new CustomError('something else');
         }),

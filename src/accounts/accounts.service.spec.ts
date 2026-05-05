@@ -49,7 +49,10 @@ describe('AccountsService', () => {
   it('honors a non-zero opening balance with exact cent precision', () => {
     const dollars = randomAmount();
     const account = service.create({ direction: 'debit', balance: dollars });
-    expect(account.balanceCents).toBe(dollarsToCents(dollars));
+    const expected = dollarsToCents(dollars);
+    expect(account.balanceCents).toBe(expected);
+    // Reconciliation depends on these starting equal at creation.
+    expect(account.openingBalanceCents).toBe(expected);
   });
 
   it('throws ConflictException on duplicate id', () => {
@@ -79,6 +82,23 @@ describe('AccountsService', () => {
     ).toThrow(BadRequestException);
   });
 
+  it('honors an injected clock and sets createdAt === updatedAt at creation', () => {
+    const now = new Date('2026-05-05T10:00:00.000Z');
+    const account = service.create({ direction: 'debit' }, now);
+    expect(account.createdAt).toBe('2026-05-05T10:00:00.000Z');
+    expect(account.updatedAt).toBe('2026-05-05T10:00:00.000Z');
+  });
+
+  it('list delegates to the repository and returns the page envelope', () => {
+    service.create({ direction: 'debit' });
+    service.create({ direction: 'credit' });
+    const page = service.list({ offset: 0, limit: 10 });
+    expect(page.total).toBe(2);
+    expect(page.items).toHaveLength(2);
+    expect(page.offset).toBe(0);
+    expect(page.limit).toBe(10);
+  });
+
   describe('defensive translation of repository errors', () => {
     // The pre-check above this catch makes the throw unreachable in normal
     // single-threaded flow. The catch exists to guard a future race between
@@ -91,6 +111,10 @@ describe('AccountsService', () => {
           throw new DuplicateIdError('account', 'race');
         }),
         findById: jest.fn().mockReturnValue(undefined),
+        findAll: jest.fn().mockReturnValue([]),
+        findPage: jest
+          .fn()
+          .mockReturnValue({ items: [], total: 0, offset: 0, limit: 20 }),
         update: jest.fn(),
       };
       const racingService = new AccountsService(stubRepo);
@@ -107,6 +131,10 @@ describe('AccountsService', () => {
           throw new CustomError('something else');
         }),
         findById: jest.fn().mockReturnValue(undefined),
+        findAll: jest.fn().mockReturnValue([]),
+        findPage: jest
+          .fn()
+          .mockReturnValue({ items: [], total: 0, offset: 0, limit: 20 }),
         update: jest.fn(),
       };
       const racingService = new AccountsService(stubRepo);

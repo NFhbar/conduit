@@ -8,7 +8,11 @@ describe('toAccountResponse', () => {
       id: randomBusinessKey('acc'),
       direction: 'debit',
       name: randomName(),
+      openingBalanceCents: 0,
       balanceCents: 12345,
+      version: 0,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-02T00:00:00.000Z',
     };
 
     const response = toAccountResponse(account);
@@ -23,7 +27,11 @@ describe('toAccountResponse', () => {
     const account: Account = {
       id: randomBusinessKey('acc'),
       direction: 'credit',
+      openingBalanceCents: 0,
       balanceCents: 0,
+      version: 0,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
     };
     expect(toAccountResponse(account).balance).toBe(0);
   });
@@ -32,7 +40,11 @@ describe('toAccountResponse', () => {
     const account: Account = {
       id: randomBusinessKey('acc'),
       direction: 'debit',
+      openingBalanceCents: 0,
       balanceCents: 0,
+      version: 0,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
     };
     const response = toAccountResponse(account);
     expect(response).not.toHaveProperty('name');

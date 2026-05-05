@@ -72,6 +72,7 @@
       "!**/*.module.ts",
       "!**/dto/**",
       "!**/*.controller.ts",
+      "!**/*.interceptor.ts",
       "!main.ts",
       "!testing/**"
     ],

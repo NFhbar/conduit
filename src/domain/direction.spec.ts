@@ -1,4 +1,4 @@
-import { applyEntry } from './direction';
+import { applyEntry, directionSign } from './direction';
 
 describe('applyEntry', () => {
   // Mirrors the four-row table from the take-home spec.
@@ -50,5 +50,15 @@ describe('applyEntry', () => {
       amountCents: 100,
     });
     expect(result).toBe(-50);
+  });
+});
+
+describe('directionSign', () => {
+  it('returns +1 for debit accounts', () => {
+    expect(directionSign('debit')).toBe(1);
+  });
+
+  it('returns -1 for credit accounts', () => {
+    expect(directionSign('credit')).toBe(-1);
   });
 });

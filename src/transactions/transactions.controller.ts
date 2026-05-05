@@ -1,4 +1,10 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  PageResponse,
+  PaginationQueryDto,
+  resolvePageQuery,
+  toPageResponse,
+} from '../common/pagination';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { LedgerService } from './ledger.service';
 import {
@@ -23,5 +29,13 @@ export class TransactionsController {
       })),
     });
     return toTransactionResponse(transaction);
+  }
+
+  @Get()
+  list(@Query() query: PaginationQueryDto): PageResponse<TransactionResponse> {
+    return toPageResponse(
+      this.ledger.list(resolvePageQuery(query)),
+      toTransactionResponse,
+    );
   }
 }
